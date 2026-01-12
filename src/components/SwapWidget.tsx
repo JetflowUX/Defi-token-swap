@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ArrowDown, ArrowUpDown, Settings } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
@@ -8,18 +8,9 @@ import { TOKENS, Token, getTokenBySymbol } from '../constants/tokens';
 export const SwapWidget = () => {
   const { isConnected } = useAccount();
   const [sellAmount, setSellAmount] = useState('');
-  const [buyAmount, setBuyAmount] = useState('');
-
   // Placeholder for now
   const [sellToken, setSellToken] = useState('ETH');
   const [buyToken, setBuyToken] = useState('USDC');
-
-  const switchTokens = () => {
-    setSellToken(buyToken);
-    setBuyToken(sellToken);
-    setSellAmount(buyAmount);
-    setBuyAmount('');
-  };
 
   const { quoteAmount, loading, error } = useTokenQuote({
     tokenIn: sellToken,
@@ -28,13 +19,13 @@ export const SwapWidget = () => {
     tradeType: TradeType.EXACT_INPUT,
   });
 
-  useEffect(() => {
-    if (quoteAmount) {
-      setBuyAmount(quoteAmount);
-    } else if (!sellAmount) {
-      setBuyAmount('');
-    }
-  }, [quoteAmount, sellAmount]);
+  const buyAmount = quoteAmount || '';
+
+  const switchTokens = () => {
+    setSellToken(buyToken);
+    setBuyToken(sellToken);
+    setSellAmount(buyAmount);
+  };
 
   const [selectingFor, setSelectingFor] = useState<'sell' | 'buy' | null>(null);
 
