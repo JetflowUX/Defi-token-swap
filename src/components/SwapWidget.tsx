@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowDown, Settings, Wallet } from 'lucide-react';
+import { ArrowDown, ArrowUpDown, Settings } from 'lucide-react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { useTokenQuote, TradeType } from '../hooks/useTokenQuote';
+import { TOKENS, Token, getTokenBySymbol } from '../constants/tokens';
 
 export const SwapWidget = () => {
   const { isConnected } = useAccount();
@@ -12,6 +13,13 @@ export const SwapWidget = () => {
   // Placeholder for now
   const [sellToken, setSellToken] = useState('ETH');
   const [buyToken, setBuyToken] = useState('USDC');
+
+  const switchTokens = () => {
+    setSellToken(buyToken);
+    setBuyToken(sellToken);
+    setSellAmount(buyAmount);
+    setBuyAmount('');
+  };
 
   const { quoteAmount, loading, error } = useTokenQuote({
     tokenIn: sellToken,
@@ -28,8 +36,28 @@ export const SwapWidget = () => {
     }
   }, [quoteAmount, sellAmount]);
 
+  const [selectingFor, setSelectingFor] = useState<'sell' | 'buy' | null>(null);
+
+  const handleTokenSelect = (token: Token) => {
+    if (selectingFor === 'sell') {
+      if (token.symbol === buyToken) {
+        setBuyToken(sellToken);
+      }
+      setSellToken(token.symbol);
+    } else if (selectingFor === 'buy') {
+      if (token.symbol === sellToken) {
+        setSellToken(buyToken);
+      }
+      setBuyToken(token.symbol);
+    }
+    setSelectingFor(null);
+  };
+
+  const currentSellToken = getTokenBySymbol(sellToken);
+  const currentBuyToken = getTokenBySymbol(buyToken);
+
   return (
-    <div className="w-full max-w-[480px] mx-auto p-4">
+    <div className="w-full max-w-[480px] mx-auto p-4 relative">
       {/* Widget Container */}
       <div className="bg-[#131B2E] border border-slate-800 rounded-3xl p-4 shadow-2xl relative overflow-hidden backdrop-blur-xl">
 
@@ -58,9 +86,11 @@ export const SwapWidget = () => {
                 placeholder="0"
                 className="bg-transparent text-3xl text-white outline-none w-full font-medium placeholder-slate-600"
               />
-              <button className="flex items-center gap-2 bg-[#1E293B] hover:bg-[#334155] text-white px-3 py-1.5 rounded-full font-semibold transition-all shrink-0">
-                {/* <img src="/eth-logo.png" className="w-6 h-6 rounded-full" /> */}
-                <span className="w-6 h-6 rounded-full bg-blue-500"></span>
+              <button
+                onClick={() => setSelectingFor('sell')}
+                className="flex items-center gap-2 bg-[#1E293B] hover:bg-[#334155] text-white px-3 py-1.5 rounded-full font-semibold transition-all shrink-0"
+              >
+                <span className={`w-6 h-6 rounded-full ${currentSellToken?.color}`}></span>
                 {sellToken}
                 <ArrowDown size={16} className="text-slate-400" />
               </button>
@@ -73,8 +103,11 @@ export const SwapWidget = () => {
           {/* Swap Indicator */}
           <div className="relative h-2 z-10">
             <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#131B2E] p-1.5 rounded-xl border-4 border-[#131B2E]">
-              <div className="bg-[#1E293B] p-2 rounded-lg hover:bg-[#334155] cursor-pointer transition-colors border border-slate-800">
-                <ArrowDown size={16} className="text-blue-400" />
+              <div
+                className="bg-[#1E293B] p-2 rounded-lg hover:bg-[#334155] cursor-pointer transition-colors border border-slate-800"
+                onClick={switchTokens}
+              >
+                <ArrowUpDown size={16} className="text-blue-400" />
               </div>
             </div>
           </div>
@@ -93,15 +126,18 @@ export const SwapWidget = () => {
                 placeholder="0"
                 className="bg-transparent text-3xl text-white outline-none w-full font-medium placeholder-slate-600"
               />
-              <button className="flex items-center gap-2 bg-[#1E293B] hover:bg-[#334155] text-white px-3 py-1.5 rounded-full font-semibold transition-all shrink-0">
-                <span className="w-6 h-6 rounded-full bg-green-500"></span>
+              <button
+                onClick={() => setSelectingFor('buy')}
+                className="flex items-center gap-2 bg-[#1E293B] hover:bg-[#334155] text-white px-3 py-1.5 rounded-full font-semibold transition-all shrink-0"
+              >
+                <span className={`w-6 h-6 rounded-full ${currentBuyToken?.color}`}></span>
                 {buyToken}
                 <ArrowDown size={16} className="text-slate-400" />
               </button>
             </div>
             <div className="flex justify-between mt-2 h-4">
               <span className="text-slate-500 text-xs text-right w-full">
-                {loading ? 'Fetching best price...' : error ? <span className="text-red-400">Error fetching price</span> : '$0.00'}
+                {loading ? 'Fetching best price...' : error ? <span className="text-red-400">Error fetching price</span> : ''}
               </span>
             </div>
           </div>
@@ -204,6 +240,52 @@ export const SwapWidget = () => {
           )}
         </div>
       </div>
+
+      {/* Token Select Modal */}
+      {selectingFor && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-3xl"
+            onClick={() => setSelectingFor(null)}
+          />
+
+          {/* Modal Content */}
+          <div className="bg-[#1E293B] w-full max-w-sm rounded-2xl border border-slate-700 shadow-2xl relative z-10 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-4 border-b border-slate-700 flex justify-between items-center">
+              <h3 className="text-white font-semibold">Select Token</h3>
+              <button
+                onClick={() => setSelectingFor(null)}
+                className="text-slate-400 hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="max-h-[300px] overflow-y-auto p-2">
+              {TOKENS.map((token) => (
+                <button
+                  key={token.symbol}
+                  onClick={() => handleTokenSelect(token)}
+                  className="w-full flex items-center gap-3 p-3 hover:bg-slate-700/50 rounded-xl transition-colors text-left group"
+                >
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center ${token.color} text-white font-bold text-xs`}>
+                    {token.symbol[0]}
+                  </span>
+                  <div>
+                    <div className="text-white font-medium">{token.name}</div>
+                    <div className="text-slate-400 text-xs">{token.symbol}</div>
+                  </div>
+                  {((selectingFor === 'sell' && sellToken === token.symbol) ||
+                    (selectingFor === 'buy' && buyToken === token.symbol)) && (
+                      <div className="ml-auto text-blue-400 text-sm">Selected</div>
+                    )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

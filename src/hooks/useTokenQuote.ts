@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { usePublicClient } from 'wagmi';
-import { parseUnits, formatUnits } from 'viem';
+import { getTokenBySymbol } from '../constants/tokens';
 
 export enum TradeType {
     EXACT_INPUT,
@@ -40,18 +39,21 @@ export function useTokenQuote({ tokenIn, tokenOut, amount, tradeType }: UseToken
 
                 await new Promise((resolve) => setTimeout(resolve, 600)); // Simulate network latency
 
-                // Mock Rate: 1 ETH = 2500 USDC
-                // If selling ETH (tokenIn=ETH), buyAmount = amount * 2500
-                // If selling USDC (tokenIn=USDC), buyAmount = amount / 2500
+                const tokenInType = getTokenBySymbol(tokenIn);
+                const tokenOutType = getTokenBySymbol(tokenOut);
 
-                let calculated = 0;
-                const rate = 2500;
-
-                if (tokenIn === 'ETH') {
-                    calculated = parseFloat(amount) * rate;
-                } else {
-                    calculated = parseFloat(amount) / rate;
+                if (!tokenInType || !tokenOutType) {
+                    throw new Error("Invalid tokens");
                 }
+
+                const amountIn = parseFloat(amount);
+
+                // Calculate Value in USD
+                const valueInUsd = amountIn * tokenInType.mockUsdPrice;
+
+                // Calculate output amount (Value / OutPrice)
+                // Adding a 0.1% spread/fee simulation
+                const calculated = (valueInUsd / tokenOutType.mockUsdPrice) * 0.999;
 
                 setQuoteAmount(calculated.toFixed(6));
 
