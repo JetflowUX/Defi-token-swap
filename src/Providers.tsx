@@ -1,8 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import {
-  QueryClientProvider,
-  QueryClient,
-} from "@tanstack/react-query";
 
 interface CardanoWallet {
   address?: string;
@@ -26,8 +22,6 @@ export const useCardanoWallet = () => {
   }
   return context;
 };
-
-const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [wallet, setWallet] = useState<CardanoWallet>({
@@ -88,9 +82,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <CardanoContext.Provider value={{ wallet, connectWallet, disconnectWallet }}>
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      {children}
     </CardanoContext.Provider>
   );
 }
