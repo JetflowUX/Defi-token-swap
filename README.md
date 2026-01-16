@@ -1,17 +1,17 @@
 # Cardano Token Swap Widget
 
-A modern, responsive React-based token swap widget designed for the Cardano ecosystem. This project demonstrates a clean UI for swapping ADA and Cardano native tokens (DJED, MIN, AGIX, etc.), with integration support for Cardano wallets and DEX protocols.
+A modern, responsive React-based token swap widget designed for the Cardano ecosystem. This project demonstrates a clean UI for swapping ADA (Cardano) with USDT (Tether USD), with integration support for Cardano wallets and DEX protocols.
 
 > [!NOTE]
-> **Simulation Mode**: The current implementation simulates token price quotes (mock ADA and Cardano native tokens) and does not execute real transactions on any blockchain. It serves as a UI/UX demonstration and frontend template.
+> **Simulation Mode**: The current implementation simulates ADA ↔ USDT swap quotes with mock prices and does not execute real transactions on any blockchain. It serves as a UI/UX demonstration and frontend template.
 
 ## Features
 
 - **Cardano Wallet Integration**: Ready for integration with [Nami](https://namiwallet.io/), [Eternl](https://eternl.io/), [Flint](https://flint.cx/), and other Cardano browser wallets.
-- **ADA & Native Tokens**: Built-in support for swapping ADA with Cardano native tokens (DJED, MIN, AGIX, etc.).
+- **ADA ↔ USDT Swap**: Built-in support for swapping between ADA (Cardano native coin) and USDT (Tether USD stablecoin).
 - **Token Swap UI**: Intuitive interface for inputting "Pay" and "Receive" amounts with real-time quote simulation.
 - **Responsive Design**: Built with Tailwind CSS for a fully responsive experience on desktop and mobile.
-- **Dark Mode**: Features a sleek dark mode with ambient background effects optimized for DeFi interfaces.
+- **Clean UI**: Features a modern, light-themed interface optimized for DeFi swap operations.
 
 ## Tech Stack
 
@@ -27,14 +27,12 @@ A modern, responsive React-based token swap widget designed for the Cardano ecos
 
 ## Supported Tokens
 
-The widget supports swapping the following Cardano tokens (with mock prices for demo):
+The widget supports swapping the following pair (with mock prices for demo):
 
-| Token  | Name             | Decimals | Mock Price | Network |
-|--------|------------------|----------|------------|---------|
-| ADA    | Cardano          | 6        | $0.35      | Mainnet |
-| DJED   | Djed Stablecoin  | 6        | $1.00      | Mainnet |
-| MIN    | MIN Finance      | 6        | $0.12      | Mainnet |
-| AGIX   | SingularityNET   | 6        | $0.08      | Mainnet |
+| Token  | Name          | Decimals | Mock Price | Type       |
+|--------|---------------|----------|------------|------------|
+| ADA    | Cardano       | 6        | $0.35      | Native Coin |
+| USDT   | Tether USD    | 6        | $1.00      | Stablecoin |
 
 *Mock prices are used for UI simulation only. Replace with real oracle data (e.g., from CoinGecko or DEX protocols) in production.*
 
